@@ -1,0 +1,35 @@
+# Ignorer tout sauf la structure des dossiers
+
+# Functions/ (partagé intégralement)
+!Functions/
+
+# raster/ (partagé, mais sans le contenu)
+raster/*
+!raster/.gitkeep
+raster/**/*.tif
+
+# data/ (partagé, sauf les fichiers sauf ceux dans Colliers_9999_brutes/)
+data/*
+!data/.gitkeep
+!data/Colliers_9999_brutes/
+!data/Colliers_9999_brutes/**
+
+# Ignorer les fichiers des autres années dans data/
+data/Colliers_[0-9][0-9][0-9][0-9]_brutes/
+
+# outputs/ (le dossier est partagé, mais pas son contenu)
+outputs/*
+!outputs/.gitkeep
+
+# Fichiers scripts (partagés intégralement)
+!config.R
+!script_analysis.R
+
+# Ignorer fichiers temporaires
+*.Rhistory
+*.Rproj.user
+*.RData
+*.log
+.DS_Store
+Thumbs.db
+.Rproj.user
