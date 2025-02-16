@@ -37,6 +37,6 @@ if (length(function_files) > 0) {
 sapply(function_files, source)
 
 # Paramètres globaux
-YEAR <- 2022
+
 ncores <- parallel::detectCores() /3 # Utilisation optimale des cœurs CPU
 

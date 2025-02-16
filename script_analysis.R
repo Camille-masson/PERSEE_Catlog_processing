@@ -16,106 +16,129 @@ ALPAGES_TOTAL <- list(
 )
 ALPAGES <- ALPAGES_TOTAL[[as.character(YEAR)]]
 
-### 1. GPS TRAJECTORIES FILTERING ###
-#-----------------------------------#
 
-
-### 1.1 Simplification en GPKG
+#### 1. Simplification en GPKG ####
+#----------------------------------#
 
 
 if (FALSE) {  # Mettre TRUE pour exécuter
   library(terra)
   source(file.path(functions_dir, "Functions_filtering.R"))
   
+  # ENTREE
+  # Un dossier contenant les trajectoires brutes, au format csv issu des colliers catlog, rangées dans des sous-dossiers au nom de leurs alpages
   raw_data_dir <- file.path(data_dir, paste0("Colliers_", YEAR, "_brutes"))
-  alpages <- c("Alpage_demo")
-  output_file <- file.path(output_dir, paste0("Donnees_brutes_", YEAR,"_",alpages,"_simplifiees.gpkg"))
   
+  # Les alpage devant être traité
+  alpages <- c("Alpage_demo")
+  
+  # SORTIE
+  
+  # Création du sous-dossier de sortie : GPS_simple_GPKG
+  gps_output_dir <- file.path(output_dir, "GPS_simple_GPKG")
+  if (!dir.exists(gps_output_dir)) {
+    dir.create(gps_output_dir, recursive = TRUE)
+  }
+  # Créeation du GPKG de sortie nommé : Donnees_brutes_9999_Alpage_demo_simplifiees.gpkg
+  output_file <- file.path(gps_output_dir, paste0("Donnees_brutes_", YEAR, "_", alpages, "_simplifiees.gpkg"))
+  
+  
+  #CODE
   
   lapply(alpages, function(alpage) {
-    collar_dir <- file.path(raw_data_dir, alpage)
-    collar_files <- list.files(collar_dir, full.names = TRUE)
+    collar_dir <- file.path(raw_data_dir, alpage) # Chemin Dossier GPS contenant les fichier de l'alpage
+    collar_files <- list.files(collar_dir, full.names = TRUE) # Liste des CSV de ce dossier (les différents colliers)
     lapply(collar_files, function(collar_f) {
-      collar_ID <- strsplit(basename(collar_f), split = "_")[[1]][1]
-      load_catlog_data(collar_f) %>%
-        slice(which(row_number() %% 30 == 10)) %>%
-        mutate(ID = collar_ID, date = lubridate::format_ISO8601(date)) %>%
-        vect(geom = c("lon", "lat"), crs = CRS_WSG84)
-    }) %>% do.call(rbind, .)
+      collar_ID <- strsplit(basename(collar_f), split = "_")[[1]][1] # Extraction de l'id du collier (forme = C00_000000 -> C00)
+      load_catlog_data(collar_f) %>% # Cargement des données GPS brut
+        slice(which(row_number() %% 30 == 10)) %>% #Garde un point GPS tout les 30 mesures
+        mutate(ID = collar_ID, date = lubridate::format_ISO8601(date)) %>% # Convertir date et heure au bon format avec lubridate
+        vect(geom = c("lon", "lat"), crs = CRS_WSG84) # Transformation du dataframe en objet spacial (crs = WSG84)
+    }) %>% do.call(rbind, .) # Fusionne les données des différents colliers
   }) %>% do.call(rbind, .) %>%
-    writeVector(filename = output_file, overwrite = TRUE)
+    writeVector(filename = output_file, overwrite = TRUE) # Données au format GPKG
 }
 
 
-### 1.2 BJONERAAS FILTER CALIBRATION
+#### 2.BJONERAAS FILTER CALIBRATION ####
+#--------------------------------------#
 if (F) {
   # Chargement des fonctions nécessaires
   source(file.path(functions_dir, "Functions_filtering.R"))
   source(file.path(functions_dir, "Functions_map_plot.R"))
+  
   # ENTREES
-  # Un dossier contenant les trajectoires brutes, au format csv issu des colliers catlog, rangées dans des sous-dossiers au nom de leurs alpages
+  # Un dossier contenant les trajectoires brutes, au format csv issu des colliers Catlog,
+  # rangées dans des sous-dossiers au nom de leurs alpages
   raw_data_dir = file.path(data_dir,paste0("Colliers_",YEAR,"_brutes"))
-  # Un data.frame contenant les dates de pose et de retrait des colliers, Doit contenir les colonnes  "alpage", "date_pose" et "date_retrait"
+  
+  # Un data.frame contenant les dates de pose et de retrait des colliers
+  # Doit contenir les colonnes "alpage", "date_pose" et "date_retrait"
   AIF <- file.path(raw_data_dir, paste0(YEAR,"_infos_alpages.csv"))
-  #Vérification du format du fichier (souvent mal formaté, attention csv UTF8)
+  
+  # Vérification du format du fichier (souvent mal formaté, attention csv UTF8)
   AIF_data <- read.csv(AIF, sep = ",", header = TRUE, row.names = NULL, check.names = FALSE, encoding = "UTF-8")
   
   # L’alpage devant être traité
   alpage = "Alpage_demo"
   
-  #Fichier pdf de sortie
+  # Fichier pdf de sortie pour visualisation du filtrage
   pdf(file.path(output_dir,paste0("Filtering_calibration_",YEAR,"_",alpage,".pdf")), width = 9, height = 9)
   
   # Liste des fichiers de données brutes pour l'alpage
   files <- list.files(file.path(raw_data_dir, alpage), full.names = TRUE)
-  files <- files[1:3]  # Sélection des trois premiers fichiers
+  files <- files[1:3]  # Sélection des trois premiers fichiers (évite surcharge mémoire)
   
-  # Chargement et concaténation des données
+  # Chargement et concaténation des données des fichiers sélectionnés
   data <- do.call(rbind, lapply(files, function(file) { 
-    data <- load_catlog_data(file)
-    data$ID <- file
+    data <- load_catlog_data(file) # Chargement des fichiers CSV avec la fonction dédiée
+    data$ID <- file  # Ajout de l'identifiant du fichier pour tracer son origine
     return(data) 
   }))
   
   # Récupération des dates de pose et de retrait du collier
   beg_date = as.POSIXct(get_alpage_info(alpage, AIF, "date_pose"), tz="GMT", format="%d/%m/%Y %H:%M")
   end_date = as.POSIXct(get_alpage_info(alpage, AIF, "date_retrait"), tz="GMT", format="%d/%m/%Y %H:%M")
-  data = date_filter(data, beg_date, end_date)
+  data = date_filter(data, beg_date, end_date) # Filtrage des données en fonction des dates de validité
   
-  # Projection des données en Lambert93
+  # Projection des données en Lambert93 (EPSG:2154) à partir de WGS84 (EPSG:4326)
   data_xy <- data %>%
     terra::vect(crs="EPSG:4326") %>%
     terra::project("EPSG:2154") %>%
-    as.data.frame(geom = "XY") %>%
-    head()
+    as.data.frame(geom = "XY")
   
-  
-  # Histogramme des périodes d’échantillonnage
+  # Histogramme des intervalles de temps entre points GPS
   temps <- diff(data_xy$date)
   temps <- as.numeric(temps, units = "mins")
   hist(temps, nclass = 30)
   
-  # Histogramme des distances parcourues
+  # Histogramme des distances parcourues entre deux positions successives
   dist <- sqrt(diff(data_xy$x)^2+diff(data_xy$y)^2)
   h <- hist(dist, nclass = 30, xlab='Distance (m)', xaxt="n")
   
   ### Test de différents filtres
-  # Parameters sets to be tested
-  medcrits = c(750, 500, 750)
-  meancrits = c(500, 500, 350)
-  spikesps = c(1500, 1500, 1500)
-  spikecoss = c(-0.95, -0.95, -0.95)
+  # Définition des valeurs de test pour le filtre de Bjorneraas
+  medcrits = c(750, 500, 750) # Seuil médian des distances anormales
+  meancrits = c(500, 500, 350) # Seuil moyen des distances anormales
+  spikesps = c(1500, 1500, 1500) # Seuil de vitesse maximale (m/h)
+  spikecoss = c(-0.95, -0.95, -0.95) # Seuil de changement de direction (cosinus d’angle)
   
   for (i in 1:length(medcrits)) {
+    # Application du filtre de Bjorneraas avec chaque combinaison de paramètres
     trajectories <- position_filter(data, medcrit=medcrits[i], meancrit=meancrits[i], spikesp=spikesps[i], spikecos=spikecoss[i])
     
+    # Détermination des limites spatiales de la carte
     minmax_xy = get_minmax_L93(trajectories[!(trajectories$R1error | trajectories$R2error ),], buffer = 100)
     
+    # Attribution des codes d'erreur pour visualisation
     trajectories$errors = 1
     trajectories$errors[trajectories$R1error] = 2
     trajectories$errors[trajectories$R2error] = 3
     
+    # Définition de la palette de couleurs pour la carte
     pal <- c("#56B4E9", "red", "black")
+    
+    # Affichage des trajectoires GPS avec erreurs détectées
     print(ggplot(trajectories, aes(x, y, col = errors)) +
             geom_path(size = 0.2) +
             geom_point(size = 0.3) +
@@ -124,6 +147,7 @@ if (F) {
             ggtitle(paste0("medcrit = ", medcrits[i], ", meancrit = ", meancrits[i], ", spikesp = ", spikesps[i], ", spikecos = ", spikecoss[i])) +
             scale_colour_gradientn(colors=pal, guide="legend", breaks = c(1, 2, 3), labels = c("OK", "R1error", "R2error")))
     
+    # Zoom sur les cinq premiers jours après la pose
     trajectories <- trajectories %>%
       filter(date < beg_date + 3600*24*5)
     print(ggplot(trajectories, aes(x, y, col = errors)) +
@@ -133,12 +157,16 @@ if (F) {
             ggtitle(paste0("5 days only, medcrit = ", medcrits[i], ", meancrit = ", meancrits[i], ", spikesp = ", spikesps[i], ", spikecos = ", spikecoss[i])) +
             scale_colour_gradientn(colors=pal, guide="legend", breaks = c(1, 2, 3), labels = c("OK", "R1error", "R2error")))
   }
+  
+  # Fermeture du fichier PDF contenant les visualisations
   dev.off()
 }
 
  
 
-### 1.3 FILTERING CATLOG DATA
+#### 3. FILTERING CATLOG DATA ####
+#--------------------------------#
+
 if (F) {
   source(file.path(functions_dir, "Functions_filtering.R"))
   # ENTREES
@@ -200,7 +228,7 @@ if (F) {
 str(IFF_data)
 
 
-### 3. HMM FITTING ### 
+### 2. HMM FITTING ### 
 #--------------------#
 if (F) {
   library(snow)

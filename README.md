@@ -183,9 +183,116 @@ Ce tableau contient les informations relatives aux individus sur lesquels les co
 
 
 
+## Description du code
+
+### config.R
+
+Le script `config.R` permet de configurer automatiquement l’environnement de travail du projet. Il définit :
+
+- Les chemins des dossiers principaux
+- Le chargement des bibliothèques
+- Le chargement automatique des fonctions
+- Les paramètres globaux
+
+*Remarque* : Il est essentiel d’exécuter (`source`) ce script pour garantir le bon fonctionnement du projet. Ce script est automatiquement appelé dans `script_analysis.R` (Section `0. LIBRARIES AND CONSTANTS`).
+
 ---
 
-## Description du code 
+### script_analysis.R
+
+Le script `script_analysis.R` est le script principal permettant de générer toutes les données de sortie (caractérisation des comportements, calcul du taux de chargement, etc.) à partir des données GPS.
+
+Ce script s’articule en cinq parties décrites ci-dessous.
+
+---
+
+**Partie 1 : SIMPLIFICATION DATA EN GPKG**
+
+**Objectif :** 
+
+Cette première étape permet de simplifier les données GPS brutes et de les transformer en un fichier GPKG (GeoPackage). L'objectif est de visualiser dans QGIS la date exacte de pose et retrait des colliers GPS.
+
+**Données d’entrée :** 
+
+- Données brutes GPS des colliers : `data/Colliers_9999_brutes/`
+
+**Données de sortie :**
+
+- Fichier GPKG généré dans `outputs/GPS_simple_GPKG/`
+- Nom du fichier : `Donnees_brutes_9999_Alpage_demo_simplifiees.gpkg`
+- Ce fichier contiendra les données simplifiées par alpage
+
+**Etapes de traitement QGIS pour identifier la date de pose et de retrait des colliers :**
+
+1. Exécuter la section de code dans `script_analysis.R`.  
+   Cela va générer le fichier GPKG dans `outputs/GPS_simple_GPKG/`.
+
+2. Importer la couche GPKG dans QGIS.  
+   - Ouvrir QGIS.  
+   - Aller dans "Ajouter une couche" → "Ajouter une couche vecteur".  
+   - Sélectionner le fichier `Donnees_brutes_9999_Alpage_demo_simplifiees.gpkg`.
+
+3. Créer une colonne "Datetime" pour l'analyse temporelle.  
+   - Ouvrir "Calculatrice de champ".  
+   - Ajouter un nouveau champ :  
+     - Nom : `Datetime`  
+     - Type : `Date et heure`  
+     - Expression :  
+       `to_datetime(date)` 
+     - Valider et appliquer.
+
+4. Appliquer un style coloré par ID de collier.  
+   - Aller dans Propriétés de la couche → Symbologie.  
+   - Choisir "Catégorisé".  
+   - Sélectionner le champ `ID`.  
+   - Cliquer sur "Classer" pour attribuer une couleur unique à chaque collier.
+
+5. Activer le contrôle temporel dynamique.  
+   - Aller dans Propriétés de la couche → Onglet "Temporel".  
+   - Cocher la case "Activer le contrôle temporel dynamique".  
+   - Dans "Configuration", choisir :  
+     - "Champ unique avec date et heure".  
+     - Sélectionner le champ `Datetime`.  
+   - Valider.
+
+6. Utiliser l'animation temporelle pour visualiser les trajectoires GPS.  
+   - Dans la fenêtre principale, cliquer sur l’icône d’horloge pour ouvrir le Panneau de contrôle temporel.  
+   - Régler la "Plage d’animation" avec :  
+     - Date de début et date de fin correspondant à la saison d’étude.  
+     - Pas de temps : 24 heures.
+
+7. Explorer les trajectoires GPS pour identifier les dates de pose et retrait des colliers.  
+   - Jouer l’animation pour voir quand chaque collier a cessé d’émettre.  
+   - Cocher/décocher les colliers dans la légende pour isoler leur mouvement.
+
+---
+
+**Partie 2 : BJONERAAS FILTER CALIBRATION **
+
+**Objectif :**
+
+Ce script permet d’analyser et filtrer les données GPS en utilisant la méthode de Bjorneraas, pour éliminer les erreurs de position et améliorer la qualité des trajectoires. Il offre une visualisation des données brutes et filtrées, et permet de tester plusieurs ensembles de paramètres avant d’adopter un filtrage optimal.
+
+**Principe du filtre de Bjorneraas :**
+
+Bjorneraas et al. (2010) ont développé une méthode de filtrage des erreurs GPS en écologie du mouvement, basée sur :
+
+- Un filtre médian (medcrit) : détecte les points aberrants sur la base des distances médianes entre points.
+- Un filtre de moyenne (meancrit) : supprime les points très éloignés de la moyenne des distances parcourues.
+- Un seuil de vitesse (spikesp) : élimine les points où la vitesse dépasse un seuil défini.
+- Un critère de changement brutal de direction (spikecos) : supprime les virages anormaux.
+
+Ces filtres permettent d’éliminer les erreurs dues à des sauts GPS ou des réflexions du signal.
 
 
- 
+**Données d'entrés : **
+
+- Données brutes GPS des colliers : `data/Colliers_9999_brutes/`
+- Fichier d’information sur l’alpage : `data/Colliers_9999_brutes/YEAR_infos_alpages.csv`
+  
+
+**Données de sortie : **
+- Fichier PDF de sortie : `outputs/Filtering_calibration_YEAR_Alpage_demo.pdf`
+  - Ce fichier contiendra des visualisations des trajectoires GPS brutes, des résultats des filtres appliqués, et des erreurs détectées (R1 et R2).
+  - Chaque graphique montre les trajectoires avec des codes de couleurs pour les points valides et les erreurs détectées.
+
