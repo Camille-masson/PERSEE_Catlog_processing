@@ -1,31 +1,31 @@
 # Ignorer tout sauf la structure des dossiers
 
-# Functions/ (partagé intégralement)
+# Partager entièrement le dossier Functions/
 !Functions/
 
-# raster/ (partagé, mais sans le contenu)
+# raster/ (partagé mais vide sauf .gitkeep)
 raster/*
 !raster/.gitkeep
-raster/**/*.tif
 
-# data/ (partagé, sauf les fichiers sauf ceux dans Colliers_9999_brutes/)
+# Exclure tout le dossier data/ sauf `Colliers_9999_brutes/`
 data/*
 !data/.gitkeep
 !data/Colliers_9999_brutes/
 !data/Colliers_9999_brutes/**
 
-# Ignorer les fichiers des autres années dans data/
-data/Colliers_[0-9][0-9][0-9][0-9]_brutes/
+# Exclure toutes les autres années sauf 9999
+data/Colliers_[0-9][0-9][0-9][0-8]_brutes/
+data/Colliers_[1-9][0-9][0-9][0-9]_brutes/
 
-# outputs/ (le dossier est partagé, mais pas son contenu)
+# outputs/ (partagé mais vide sauf .gitkeep)
 outputs/*
 !outputs/.gitkeep
 
-# Fichiers scripts (partagés intégralement)
+# Scripts à garder
 !config.R
 !script_analysis.R
 
-# Ignorer fichiers temporaires
+# Ignorer fichiers temporaires et spécifiques à RStudio
 *.Rhistory
 *.Rproj.user
 *.RData
