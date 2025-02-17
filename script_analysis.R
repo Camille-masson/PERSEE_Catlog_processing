@@ -25,14 +25,14 @@ if (FALSE) {  # Mettre TRUE pour exécuter
   library(terra)
   source(file.path(functions_dir, "Functions_filtering.R"))
   
-  # ENTREE
+  ## ENTREE ##
   # Un dossier contenant les trajectoires brutes, au format csv issu des colliers catlog, rangées dans des sous-dossiers au nom de leurs alpages
   raw_data_dir <- file.path(data_dir, paste0("Colliers_", YEAR, "_brutes"))
   
   # Les alpage devant être traité
   alpages <- c("Alpage_demo")
   
-  # SORTIE
+  ## SORTIE ##
   
   # Création du sous-dossier de sortie : GPS_simple_GPKG
   gps_output_dir <- file.path(output_dir, "GPS_simple_GPKG")
@@ -43,7 +43,7 @@ if (FALSE) {  # Mettre TRUE pour exécuter
   output_file <- file.path(gps_output_dir, paste0("Donnees_brutes_", YEAR, "_", alpages, "_simplifiees.gpkg"))
   
   
-  #CODE
+  ## CODE ##
   
   lapply(alpages, function(alpage) {
     collar_dir <- file.path(raw_data_dir, alpage) # Chemin Dossier GPS contenant les fichier de l'alpage
@@ -67,7 +67,7 @@ if (F) {
   source(file.path(functions_dir, "Functions_filtering.R"))
   source(file.path(functions_dir, "Functions_map_plot.R"))
   
-  # ENTREES
+  ## ENTREES ##
   # Un dossier contenant les trajectoires brutes, au format csv issu des colliers Catlog,
   # rangées dans des sous-dossiers au nom de leurs alpages
   raw_data_dir = file.path(data_dir,paste0("Colliers_",YEAR,"_brutes"))
@@ -82,7 +82,7 @@ if (F) {
   # L’alpage devant être traité
   alpage = "Alpage_demo"
   
-  # SORTIE
+  ## SORTIE ##
   # Création du sous-dossier pour stocker les résultats du filtre de Bjorneraas
   filter_output_dir <- file.path(output_dir, "Filtre_de_Bjorneraas")
   if (!dir.exists(filter_output_dir)) {
@@ -91,7 +91,8 @@ if (F) {
   # Fichier pdf de sortie pour visualisation du filtrage
   pdf(file.path(filter_output_dir, paste0("Filtering_calibration_", YEAR, "_", alpage, ".pdf")), width = 9, height = 9)
   
-  # CODE
+  
+  ## CODE ##
   # Liste des fichiers de données brutes pour l'alpage
   files <- list.files(file.path(raw_data_dir, alpage), full.names = TRUE)
   files <- files[1:3]  # Sélection des trois premiers fichiers (évite surcharge mémoire)
@@ -175,8 +176,10 @@ if (F) {
 #--------------------------------#
 
 if (F) {
+  # Chargement des fonctions nécessaires
   source(file.path(functions_dir, "Functions_filtering.R"))
-  # ENTREES
+  
+  ## ENTREES ##
   # Un dossier contenant les trajectoires brutes, au format csv issu des colliers catlog, rangées dans des sous-dossiers au nom de leurs alpages. Coordonnées en WSG84. Le nom des fichiers, sous la forme "ID_quelquechose.csv", sera utilisé pour déterminer l’ID du collier qui doit comporter 3 caractères.
   raw_data_dir = file.path(data_dir,paste0("Colliers_",YEAR,"_brutes"))
   # Un fichier contenant les informations sur chaque individu équipé, les dates de pose et de retrait des colliers, ainsi que la proportion de temps pour laquelle les colliers sont programmés pour être allumés (18h par jour = 0.75). Doit contenir les colonnes "Collier", "Alpage", "Espece", "Race", "date_pose", "date_retrait" et "proportion_jour_allume"
@@ -188,7 +191,7 @@ if (F) {
   # Les alpages à traiter
   alpages = c("Alpage_demo")
   
-  # SORTIES
+  ## SORTIES ##
   filter_output_dir <- file.path(output_dir, "Filtre_de_Bjorneraas")
   if (!dir.exists(filter_output_dir)) {
     dir.create(filter_output_dir, recursive = TRUE)
@@ -199,6 +202,7 @@ if (F) {
   # Un .csv contenant les performances des colliers (pourcentages de points éliminés à chaque étape, colliers défectueux...)
   indicator_file = file.path(filter_output_dir, paste0(YEAR,"_filtering_",alpages,".csv"))
   
+  ## CODE ##
   
   for (alpage in alpages) {
     print(paste("WORKING ON ALPAGE", alpage))
@@ -335,7 +339,7 @@ if (F) {
 
 
 
-### 4.1. FLOCK STOCKING RATE (charge) BY DAY AND BY STATE ###
+#### 5. FLOCK STOCKING RATE (charge) BY DAY AND BY STATE ####
 #-------------------------------------------------------------#
 library(adehabitatHR)
 library(data.table)
