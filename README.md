@@ -204,6 +204,8 @@ Le script `script_analysis.R` est le script principal permettant de générer to
 
 Ce script s’articule en cinq parties décrites ci-dessous.
 
+
+
 ---
 
 **Partie 1 : SIMPLIFICATION DATA EN GPKG**
@@ -265,6 +267,9 @@ Cette première étape permet de simplifier les données GPS brutes et de les tr
    - Jouer l’animation pour voir quand chaque collier a cessé d’émettre.  
    - Cocher/décocher les colliers dans la légende pour isoler leur mouvement.
 
+
+
+
 ---
 
 **Partie 2 : BJONERAAS FILTER CALIBRATION **
@@ -288,11 +293,69 @@ Ces filtres permettent d’éliminer les erreurs dues à des sauts GPS ou des r�
 **Données d'entrés : **
 
 - Données brutes GPS des colliers : `data/Colliers_9999_brutes/`
-- Fichier d’information sur l’alpage : `data/Colliers_9999_brutes/YEAR_infos_alpages.csv`
+- Fichier d’information sur l’alpage : `data/Colliers_9999_brutes/9999_infos_alpages.csv`
   
 
 **Données de sortie : **
-- Fichier PDF de sortie : `outputs/Filtering_calibration_YEAR_Alpage_demo.pdf`
+
+- Fichier PDF de sortie : `outputs/Filtre_de_Bjorneraas/Filtering_calibration_YEAR_Alpage_demo.pdf`
   - Ce fichier contiendra des visualisations des trajectoires GPS brutes, des résultats des filtres appliqués, et des erreurs détectées (R1 et R2).
   - Chaque graphique montre les trajectoires avec des codes de couleurs pour les points valides et les erreurs détectées.
+
+---
+
+**Partie 3 : FILTERING CATLOG DATA **
+
+**Objectif :**
+Cette partie permet de filtrés les données brutes des gps en appliquant le filtre de Bjorneraas. 
+
+
+**Données d'entrés : **
+
+- Données brutes GPS des colliers : `data/Colliers_9999_brutes/`
+- Fichier d’information individuel sur les colliers : `data/Colliers_9999_brutes/9999_colliers_poses.csv`
+
+
+
+
+**Données de sortie : **
+
+- Données GPS filtrés : `outputs/Filtre_de_Bjorneraas/Catlog_9999_filtered_Alpage_demo.rds`
+- Fichier csv : `outputs/Filtre_de_Bjorneraas/9999_filtering_Alpage_demo.csv`
+  - Ce fichier contiendra le nombre de point filtrés par colliers du aux erreurs détectées (R1 et R2).
+  - Ainsi que le nombre de point total tout collier confondues filtré
+ 
+
+---
+
+
+**Partie 4 : HMM FITTING **
+
+**Objectif :**
+Cette partie permet l'analyse des trajéctoire GPS des brebis en utilisant le modèle caché de Markov (HMM- Hidden Markov Model) afins de caractérisés trois type de comportement : déplacement, paturage, repos.
+Il s'appuie sur les trajéctoires filtrées par le filtre de Bjorneraas effectué dans la partie 3. 
+
+
+Cette partie permet de filtrés les données brutes des gps en appliquant le filtre de Bjorneraas. 
+
+
+**Données d'entrés : **
+
+- Données GPS filtrés : `outputs/Filtre_de_Bjorneraas/Catlog_9999_filtered_Alpage_demo.rds`
+- Fichier d’information individuel sur les colliers : `data/Colliers_9999_brutes/9999_colliers_poses.csv`
+
+
+
+
+**Données de sortie : **
+
+- Trajectoires GPS catégorisées : `outputs/HMM_comportement/Catlog_9999_Alpage_demo_viterbi.rds`
+- Rapport pdf : `outputs/HMM_comportement/individual_trajectories/C00.pdf`
+  - Génère un pdf par collier
+  - Avec les résultat individuel des ajustements du modèle de Markov caché
+ 
+
+---
+
+
 
