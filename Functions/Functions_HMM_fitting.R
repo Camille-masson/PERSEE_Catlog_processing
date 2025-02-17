@@ -223,11 +223,12 @@ par_HMM_fit <- function(data, run_parameters, ncores, individual_info_file, samp
     })
 
     results <- parLapply(clus, unique(data$ID),
-                        function(ID) {
-                            alpage = get_individual_alpage(ID, individual_info_file)
-                            sampling_period = get_individual_info(ID, individual_info_file, "Periode_echantillonnage")
-
-                            return(hmm_fit(data[data$ID==ID,], run_parameters, paste0(output_dir,alpage,"/"), sampling_period)) } )
+                         function(ID) {
+                           alpage = get_individual_alpage(ID, individual_info_file)
+                           sampling_period = get_individual_info(ID, individual_info_file, "Periode_echantillonnage")
+                           
+                           return(hmm_fit(data[data$ID==ID,], run_parameters, file.path(output_dir, "HMM_comportement", "individual_trajectories"), sampling_period)) } )
+    
     stopCluster(clus)
     endTime <- Sys.time()
     print(paste("+++ Cluster total excecution time :", round(difftime(endTime, startTime, units='mins'),2), "min +++"))

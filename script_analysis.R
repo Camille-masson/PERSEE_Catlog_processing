@@ -82,9 +82,16 @@ if (F) {
   # L’alpage devant être traité
   alpage = "Alpage_demo"
   
+  # SORTIE
+  # Création du sous-dossier pour stocker les résultats du filtre de Bjorneraas
+  filter_output_dir <- file.path(output_dir, "Filtre_de_Bjorneraas")
+  if (!dir.exists(filter_output_dir)) {
+    dir.create(filter_output_dir, recursive = TRUE)
+  }
   # Fichier pdf de sortie pour visualisation du filtrage
-  pdf(file.path(output_dir,paste0("Filtering_calibration_",YEAR,"_",alpage,".pdf")), width = 9, height = 9)
+  pdf(file.path(filter_output_dir, paste0("Filtering_calibration_", YEAR, "_", alpage, ".pdf")), width = 9, height = 9)
   
+  # CODE
   # Liste des fichiers de données brutes pour l'alpage
   files <- list.files(file.path(raw_data_dir, alpage), full.names = TRUE)
   files <- files[1:3]  # Sélection des trois premiers fichiers (évite surcharge mémoire)
@@ -180,11 +187,17 @@ if (F) {
   
   # Les alpages à traiter
   alpages = c("Alpage_demo")
+  
   # SORTIES
+  filter_output_dir <- file.path(output_dir, "Filtre_de_Bjorneraas")
+  if (!dir.exists(filter_output_dir)) {
+    dir.create(filter_output_dir, recursive = TRUE)
+  }
+  
   # Un .RDS contenant les trajectoires filtrées (les nouvelles trajectoires sont ajoutées à la suite des trajectoires traitées précédemment). Coordonnées en Lambert93.
-  output_rds_file = file.path(output_dir, paste0("Catlog_",YEAR,"_filtered_",alpages,".rds"))
+  output_rds_file = file.path(filter_output_dir, paste0("Catlog_",YEAR,"_filtered_",alpages,".rds"))
   # Un .csv contenant les performances des colliers (pourcentages de points éliminés à chaque étape, colliers défectueux...)
-  indicator_file = file.path(output_dir, paste0(YEAR,"_filtering_",alpages,".csv"))
+  indicator_file = file.path(filter_output_dir, paste0(YEAR,"_filtering_",alpages,".csv"))
   
   
   for (alpage in alpages) {
@@ -225,11 +238,11 @@ if (F) {
   }
 }
 
-str(IFF_data)
 
 
-### 2. HMM FITTING ### 
-#--------------------#
+
+#### 4. HMM FITTING #### 
+#----------------------#
 if (F) {
   library(snow)
   library(stats)
@@ -244,7 +257,7 @@ if (F) {
   
   # ENTREES
   # Un .RDS contenant les trajectoires filtrées
-  input_rds_file = file.path(output_dir, paste0("Catlog_",YEAR,"_filtered_",alpage,".rds"))
+  input_rds_file <- file.path(output_dir, "Filtre_de_Bjorneraas", paste0("Catlog_", YEAR, "_filtered_", alpage, ".rds"))
   
   # Un data.frame contenant la correspondance entre colliers et alpages. Doit contenir les colonnes  "ID", "Alpage" et "Periode d’echantillonnage"
   individual_info_file <- file.path(data_dir, paste0("Colliers_", YEAR, "_brutes"), paste0(YEAR, "_colliers_poses.csv"))
@@ -253,8 +266,14 @@ if (F) {
   alpages = ALPAGES
   
   # SORTIES
+  
+  # Création du sous-dossier pour stocker les résultats du filtre de Bjorneraas
+  filter_output_dir <- file.path(output_dir, "HMM_comportement")
+  if (!dir.exists(filter_output_dir)) {
+    dir.create(filter_output_dir, recursive = TRUE)
+  }
   # Un .RDS contenant les trajectoires catégorisées par comportement (les nouvelles trajectoires sont ajoutées à la suite des trajectoires traitées précédemment)
-  output_rds_file = file.path(output_dir, paste0("Catlog_",YEAR,"_",alpage,"_viterbi.rds"))
+  output_rds_file = file.path(output_dir, "HMM_comportement", paste0("Catlog_",YEAR,"_",alpage,"_viterbi.rds"))
   
   ### LOADING DATA FOR ANALYSES
   data = readRDS(input_rds_file)
@@ -292,7 +311,7 @@ if (F) {
   # Verifié la connéxion intenert 
   
   
-  ### SUMMARIZE MODEL FITTING BY ALPAGE in rmarkdown PDFs (A revoir)
+  ##SUMMARIZE MODEL FITTING BY ALPAGE in rmarkdown PDFs (A revoir)
   parameters_df <- parameters_to_data.frame(run_parameters)
   
   
@@ -314,23 +333,6 @@ if (F) {
 }
 
 
-## A REPRENDRE : Problèlme sur alpage démo
-
-# Stocke la valeur originale de l'alpage
-original_alpage <- unique(data$alpage)
-
-# Vérifie après chaque transformation si l'alpage a été modifié
-data <- some_transformation(data)
-if (!all(unique(data$alpage) %in% original_alpage)) {
-  stop("Erreur : la colonne 'alpage' a été modifiée !")
-}
-
-# Vérification avant sauvegarde
-print(unique(data$alpage))
-saveRDS(data, output_rds_file)
-
-## FIN DE A REPRENDRE 
-
 
 
 ### 4.1. FLOCK STOCKING RATE (charge) BY DAY AND BY STATE ###
@@ -343,7 +345,7 @@ source(file.path(functions_dir, "Functions_flock_density.R"))
 
 # ENTREES
 # Un .RDS contenant les trajectoires catégorisées par comportement
-input_rds_file <- file.path(output_dir, paste0("Catlog_", YEAR, "_", alpage, "_viterbi.rds"))
+input_rds_file <- file.path(output_dir, "HMM_comportement",  paste0("Catlog_", YEAR, "_", alpage, "_viterbi.rds"))
 
 # Un data.frame contenant les tailles de troupeaux et les évolutions des tailles en fonction de la date
 flock_size_file <- file.path(raw_data_dir, paste0(YEAR, "_tailles_troupeaux.csv"))
@@ -394,6 +396,8 @@ for (alpage in alpages) {
     prop_time_collar_on
   )
   
+  gc()
+    
   #Fusion des fichier indiv
   merged_file <- flock_merge_rds_files(alpage_save_dir, state_daily_rds_prefix)
   
