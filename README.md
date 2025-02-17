@@ -204,15 +204,13 @@ Le script `script_analysis.R` est le script principal permettant de générer to
 
 Ce script s’articule en cinq parties décrites ci-dessous.
 
-
-
 ---
 
 **Partie 1 : SIMPLIFICATION DATA EN GPKG**
 
 **Objectif :** 
 
-Cette première étape permet de simplifier les données GPS brutes et de les transformer en un fichier GPKG (GeoPackage). L'objectif est de visualiser dans QGIS la date exacte de pose et retrait des colliers GPS.
+Cette première étape permet de simplifier les données GPS brutes et de les transformer en un fichier GPKG. L'objectif est de visualiser dans QGIS la date exacte de pose et de retrait des colliers GPS.
 
 **Données d’entrée :** 
 
@@ -224,7 +222,7 @@ Cette première étape permet de simplifier les données GPS brutes et de les tr
 - Nom du fichier : `Donnees_brutes_9999_Alpage_demo_simplifiees.gpkg`
 - Ce fichier contiendra les données simplifiées par alpage
 
-**Etapes de traitement QGIS pour identifier la date de pose et de retrait des colliers :**
+**Étapes de traitement QGIS pour identifier la date de pose et de retrait des colliers :**
 
 1. Exécuter la section de code dans `script_analysis.R`.  
    Cela va générer le fichier GPKG dans `outputs/GPS_simple_GPKG/`.
@@ -263,99 +261,143 @@ Cette première étape permet de simplifier les données GPS brutes et de les tr
      - Date de début et date de fin correspondant à la saison d’étude.  
      - Pas de temps : 24 heures.
 
-7. Explorer les trajectoires GPS pour identifier les dates de pose et retrait des colliers.  
+7. Explorer les trajectoires GPS pour identifier les dates de pose et de retrait des colliers.  
    - Jouer l’animation pour voir quand chaque collier a cessé d’émettre.  
    - Cocher/décocher les colliers dans la légende pour isoler leur mouvement.
 
-
-
-
 ---
 
-**Partie 2 : BJONERAAS FILTER CALIBRATION **
+**Partie 2 : BJØRNERAAS FILTER CALIBRATION**
 
 **Objectif :**
 
-Ce script permet d’analyser et filtrer les données GPS en utilisant la méthode de Bjorneraas, pour éliminer les erreurs de position et améliorer la qualité des trajectoires. Il offre une visualisation des données brutes et filtrées, et permet de tester plusieurs ensembles de paramètres avant d’adopter un filtrage optimal.
+Cette partie permet d’analyser et filtrer les données GPS en utilisant la méthode de Bjørneraas, pour éliminer les erreurs de position et améliorer la qualité des trajectoires. Il offre une visualisation des données brutes et filtrées et permet de tester plusieurs ensembles de paramètres avant d’adopter un filtrage optimal.
 
-**Principe du filtre de Bjorneraas :**
+**Principe du filtre de Bjørneraas :**
 
-Bjorneraas et al. (2010) ont développé une méthode de filtrage des erreurs GPS en écologie du mouvement, basée sur :
+Bjørneraas et al. (2010) ont développé une méthode de filtrage des erreurs GPS en écologie du mouvement, basée sur :
 
-- Un filtre médian (medcrit) : détecte les points aberrants sur la base des distances médianes entre points.
-- Un filtre de moyenne (meancrit) : supprime les points très éloignés de la moyenne des distances parcourues.
-- Un seuil de vitesse (spikesp) : élimine les points où la vitesse dépasse un seuil défini.
-- Un critère de changement brutal de direction (spikecos) : supprime les virages anormaux.
+- Un filtre médian (`medcrit`) : détecte les points aberrants sur la base des distances médianes entre points.
+- Un filtre de moyenne (`meancrit`) : supprime les points très éloignés de la moyenne des distances parcourues.
+- Un seuil de vitesse (`spikesp`) : élimine les points où la vitesse dépasse un seuil défini.
+- Un critère de changement brutal de direction (`spikecos`) : supprime les virages anormaux.
 
 Ces filtres permettent d’éliminer les erreurs dues à des sauts GPS ou des réflexions du signal.
 
-
-**Données d'entrés : **
+**Données d’entrée :** 
 
 - Données brutes GPS des colliers : `data/Colliers_9999_brutes/`
 - Fichier d’information sur l’alpage : `data/Colliers_9999_brutes/9999_infos_alpages.csv`
-  
 
-**Données de sortie : **
+**Données de sortie :** 
 
 - Fichier PDF de sortie : `outputs/Filtre_de_Bjorneraas/Filtering_calibration_YEAR_Alpage_demo.pdf`
-  - Ce fichier contiendra des visualisations des trajectoires GPS brutes, des résultats des filtres appliqués, et des erreurs détectées (R1 et R2).
+  - Ce fichier contiendra des visualisations des trajectoires GPS brutes, des résultats des filtres appliqués et des erreurs détectées (R1 et R2).
   - Chaque graphique montre les trajectoires avec des codes de couleurs pour les points valides et les erreurs détectées.
 
 ---
 
-**Partie 3 : FILTERING CATLOG DATA **
+**Partie 3 : FILTERING CATLOG DATA**
 
 **Objectif :**
-Cette partie permet de filtrés les données brutes des gps en appliquant le filtre de Bjorneraas. 
+Cette partie permet de filtrer les données brutes des GPS en appliquant le filtre de Bjørneraas.
 
-
-**Données d'entrés : **
+**Données d’entrée :** 
 
 - Données brutes GPS des colliers : `data/Colliers_9999_brutes/`
 - Fichier d’information individuel sur les colliers : `data/Colliers_9999_brutes/9999_colliers_poses.csv`
 
+**Données de sortie :** 
 
-
-
-**Données de sortie : **
-
-- Données GPS filtrés : `outputs/Filtre_de_Bjorneraas/Catlog_9999_filtered_Alpage_demo.rds`
-- Fichier csv : `outputs/Filtre_de_Bjorneraas/9999_filtering_Alpage_demo.csv`
-  - Ce fichier contiendra le nombre de point filtrés par colliers du aux erreurs détectées (R1 et R2).
-  - Ainsi que le nombre de point total tout collier confondues filtré
- 
+- Données GPS filtrées : `outputs/Filtre_de_Bjorneraas/Catlog_9999_filtered_Alpage_demo.rds`
+- Fichier CSV : `outputs/Filtre_de_Bjorneraas/9999_filtering_Alpage_demo.csv`
+  - Ce fichier contiendra le nombre de points filtrés par collier en raison des erreurs détectées (R1 et R2).
+  - Ainsi que le nombre total de points filtrés tous colliers confondus.
 
 ---
 
-
-**Partie 4 : HMM FITTING **
+**Partie 4 : HMM FITTING**
 
 **Objectif :**
-Cette partie permet l'analyse des trajéctoire GPS des brebis en utilisant le modèle caché de Markov (HMM- Hidden Markov Model) afins de caractérisés trois type de comportement : déplacement, paturage, repos.
-Il s'appuie sur les trajéctoires filtrées par le filtre de Bjorneraas effectué dans la partie 3. 
+Cette partie permet l'analyse des trajectoires GPS des brebis en utilisant le modèle caché de Markov (*HMM - Hidden Markov Model*) afin de caractériser trois types de comportements : déplacement, pâturage, repos.
+Il s'appuie sur les trajectoires filtrées par le filtre de Bjørneraas effectué dans la partie 3.
 
+**Données d’entrée :** 
 
-Cette partie permet de filtrés les données brutes des gps en appliquant le filtre de Bjorneraas. 
-
-
-**Données d'entrés : **
-
-- Données GPS filtrés : `outputs/Filtre_de_Bjorneraas/Catlog_9999_filtered_Alpage_demo.rds`
+- Données GPS filtrées : `outputs/Filtre_de_Bjorneraas/Catlog_9999_filtered_Alpage_demo.rds`
 - Fichier d’information individuel sur les colliers : `data/Colliers_9999_brutes/9999_colliers_poses.csv`
 
-
-
-
-**Données de sortie : **
+**Données de sortie :** 
 
 - Trajectoires GPS catégorisées : `outputs/HMM_comportement/Catlog_9999_Alpage_demo_viterbi.rds`
-- Rapport pdf : `outputs/HMM_comportement/individual_trajectories/C00.pdf`
-  - Génère un pdf par collier
-  - Avec les résultat individuel des ajustements du modèle de Markov caché
- 
+- Rapport PDF : `outputs/HMM_comportement/individual_trajectories/C00.pdf`
+  - Un PDF est généré par collier.
+  - Il contient les résultats individuels des ajustements du modèle de Markov caché.
+
+---
+
+---
+
+**Partie 5 : FLOCK STOCKING RATE**
+
+**Objectif :**  
+Ce script permet de calculer le taux de chargement du troupeau en fonction du jour et du comportement (repos, déplacement, pâturage).  
+Il utilise les trajectoires GPS classifiées avec le modèle HMM ainsi que les tailles de troupeaux pour estimer la pression de pâturage** sur les alpages étudiés.
+
+**Données d’entrée :**  
+
+- Trajectoires GPS catégorisées :  
+  `outputs/HMM_comportement/Catlog_9999_Alpage_demo_viterbi.rds`
+- Fichier d’information individuel sur les colliers :  
+  `data/Colliers_9999_brutes/9999_colliers_poses.csv`
+- Fichier d’évolution de la taille du troupeau :  
+  `data/Colliers_9999_brutes/9999_tailles_troupeaux.csv`
+
+**Données de sortie :**  
+
+Les résultats sont enregistrés dans `outputs/Chargements_calcules/` et stockés dans des fichiers `.rds` par alpage.
+
+- Taux de chargement par jour et par comportement :  
+  `outputs/Chargements_calcules/Alpage_demo_9999/by_day_and_state_9999_Alpage_demo.rds`
+  - Charge journalière par état comportemental (`repos`, `déplacement`, `pâturage`).
+
+- Taux de chargement par état (sur l’ensemble de la saison) :  
+  `outputs/Chargements_calcules/Alpage_demo_9999/by_state_9999_Alpage_demo.rds`
+  - Somme des charges par état comportemental, toutes journées confondues.
+
+- Taux de chargement par jour :  
+  `outputs/Chargements_calcules/Alpage_demo_9999/by_day_9999_Alpage_demo.rds`
+  - Charge totale par jour, sans distinction de comportement.
+
+- Taux de chargement total (saison complète) :  
+  `outputs/Chargements_calcules/Alpage_demo_9999/total_9999_Alpage_demo.rds`
+  - Somme des charges sur toute la saison pour l’alpage étudié.
 
 ---
 
 
 
+
+## Problèmes et erreurs possibles  
+
+Cette section vise à identifier les principaux problèmes que l'utilisateur peut rencontrer lors de l'utilisation de ce projet :  
+
+- Format des fichiers d’entrée :  
+Veiller à ce que les fichiers soient bien au format CSV UTF-8 avec "," comme séparateur.  
+
+- Format des dates : Il est important de respecter le format `dd/mm/yyyy hh:mm:ss` pour les dates de pose et de retrait des colliers.  Les secondes sont essentielles pour garantir le bon fonctionnement des scripts et l’interprétation correcte des données par les fonctions.  
+
+- Connexion Internet stable : 
+Une connexion fiable est nécessaire, notamment pour la **Partie 4** (*HMM FITTING*), qui requiert le téléchargement de données open data.  
+
+- Gestion des cœurs lors de la parallélisation :  
+  - Par défaut, le nombre de cœurs utilisés est défini comme `nombre de cœurs / 3` dans le fichier `config.R`.  
+  - Il peut être ajusté en fonction des capacités de l’ordinateur.  
+  - Certaines étapes nécessitent un temps de calcul long :  
+    - Augmenter le nombre de cœurs améliore la vitesse d'exécution.  
+    - Toutefois, cela augmente l'utilisation de la RAM, ce qui peut provoquer un arrêt du script si la mémoire est saturée.  
+
+- Taille des jeux de données et nombre de colliers traités simultanément  
+  - Plus le nombre de colliers analysés est élevé, plus les calculs sont longs.  
+  - Exemple : Le calcul du taux de chargement prend environ 12 heures pour 40 colliers.  
+  - Important d'anticiper :)
