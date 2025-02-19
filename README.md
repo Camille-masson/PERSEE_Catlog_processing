@@ -94,7 +94,7 @@ Le projet suit une organisation bien structurée :
 │-- script_analysis.R # Script principal exécutant les différentes étapes de traitement
 ```
 
-Tous les fichiers seront donc déjà créés lors du partage du projet Git ! Cependant, notamment pour le dossier `data`, il faudra organiser correctement les fichiers en suivant le modèle explicité ci-dessus et en s’appuyant sur la structure du jeu de données d’entraînement fourni. Voir la partie 4 pour plus détail sur la forme et la strcture des données. 
+Tous les fichiers seront donc déjà créés lors du partage du projet Git ! Cependant, notamment pour le dossier `data`, il faudra organiser correctement les fichiers en suivant le modèle explicité ci-dessus et en s’appuyant sur la structure du jeu de données d’entraînement fourni. Voir la partie 4 pour plus de détails sur la forme et la structure des données. 
 
 
 
@@ -103,11 +103,11 @@ Tous les fichiers seront donc déjà créés lors du partage du projet Git ! Cep
 ## Description des données d’entrée
 
 ### Jeu de données de démonstration
-Ce jeu de données est deja strcturé et paratgé de manière correcte via le git. Jeu de données dont l’année d’échantillonnage est fictive, fixée à 9999, et dont l’alpage fictif est établi sous le nom *Alpage_demo*. Ce jeu de données d’entraînement présente un échantillon de points GPS de 3 colliers sur une période d’échantillonnage restreinte à 1 mois. Il permet à la fois d’illustrer et de comprendre les différentes tables d’entrée, mais également de faciliter l’interprétation du script principal.
+Ce jeu de données est déjà strcturé et paratgé de manière correcte via le Git. Il s'agit d'un jeu de données dont l’année d’échantillonnage est fictive, fixée à 9999, et dont l’alpage fictif est établi sous le nom *Alpage_demo*. Ce jeu de données d’entraînement présente un échantillon de points GPS de 3 colliers sur une période d’échantillonnage restreinte à 1 mois. Il permet à la fois d’illustrer et de comprendre les différentes tables d’entrée, mais également de faciliter l’interprétation du script principal.
 
 ### Données GPS
 
-Chaque collier GPS extrait via le logiciel Catlog génère un fichier `.csv` encodé en UTF-8 contenant les colonnes suivantes :
+Chaque collier GPS extrait via le logiciel Catlog génère un fichier `.csv` encodé en UTF-8, contenant les colonnes suivantes :
 
 | **Colonne**           | **Description**                                        |
 |-----------------------|--------------------------------------------------------|
@@ -125,7 +125,7 @@ Chaque collier GPS extrait via le logiciel Catlog génère un fichier `.csv` enc
 | SNR AVG              | Rapport signal/bruit moyen des satellites utilisés    |
 | SNR MAX              | Rapport signal/bruit maximum parmi les satellites     |
 
-**Remarque** : Pour les utilisateurs n’ayant pas de colliers Catlog, seules les colonnes Date, Time, Latitude, Longitude, Altitude sont indispensables.
+**Remarque** : Pour les utilisateurs n’ayant pas de colliers Catlog, seules les colonnes Date, Time, Latitude, Longitude sont indispensables.
 
 
 ---
@@ -138,22 +138,29 @@ Ce tableau regroupe les informations principales liées à l’alpage. Dans le j
 
 | **Variable**              | **Description**                                                    |
 |---------------------------|------------------------------------------------------------------|
-| alpage                    | Nom de l’alpage étudié                                          |
-| nom_alpage_determinant    | Nom utilisé pour identifier l’alpage                            |
-| date_pose                 | Date de pose des colliers *(format : `dd/mm/yyyy hh:mm:ss`)*      |
-| date_retrait              | Date de retrait des colliers *(format : `dd/mm/yyyy hh:mm:ss`)*   |
-| proportion_jour_allume    | Proportion de la journée où les colliers sont actifs *(1 = 24h/24)* |
-| taille_troupeau           | Taille du troupeau associé à l’alpage                          |
-| nom1_UP                   | Nom de l’unité de pâturage principale                          |
-| medcrit                   | Valeur médiane critique de l’alpage                            |
-| meancrit                  | Valeur moyenne critique de l’alpage                            |
-| spikesp                   | Nombre de pics spécifiques                                     |
-| spikecos                  | Indice de corrélation des pics                                |
+| alpage                    | Nom de l’alpage étudié                                           |
+| nom_alpage_determinant    | Nom de l'alpage au format long (pour les visualisations)         |
+| date_pose                 | Date de pose des colliers *(format : `dd/mm/yyyy hh:mm:ss`)*     |
+| date_retrait              | Date de retrait des colliers *(format : `dd/mm/yyyy hh:mm:ss`)*  |
+| proportion_jour_allume    | Fraction de la journée où les colliers sont allumés *(1 = 24h/24)* |
+| taille_troupeau           | Taille du troupeau associé à l’alpage                            |
+| nom1_UP                   | ?Nom de l’unité de pâturage principale?                          |
+| medcrit                   | Valeur seuil median (en mètre) ; Parmètres de Bjorneraas         |
+| meancrit                  | Valeur seuil moyen (en mètre) ; Parmètres de Bjorneraas          |
+| spikesp                   | Seuil de vitesse du pic ; Parmètres de Bjorneraas                |
+| spikecos                  | Seuil de l'angle du pic ; Parmètres de Bjorneraas                |
 
 
 #### Évolution de la taille du troupeau : `AAAA_tailles_troupeaux.csv`
 
-Ce tableau contient l’évolution de la taille du troupeau au cours de la saison d’alpage. La taille du troupeau peut être fixe (cas principal, où elle ne change pas), ou variable en fonction du temps, notamment pour des contraintes techniques ou des mesures de gestion (exemple : alpage du Viso). Dans ce cas, il est important de noter les variations de la taille du troupeau en fonction du temps.
+Ce tableau présente l’évolution de la taille du troupeau au cours de la saison d’alpage.
+
+La taille du troupeau peut être :
+
+- Fixe (cas le plus fréquent, où elle ne varie pas).
+- Variable au cour de la saison, notamment en raison de contraintes techniques ou de mesures de gestion (ex. : alpage du Viso).
+
+Dans ce dernier cas, il est nécessaire de noter l’évolution de la taille du troupeau pour chaque date de variation, en précisant l’alpage concerné ainsi que la nouvelle taille du troupeau à la date donnée.
 
 | **Variable**              | **Description**                                                    |
 |---------------------------|------------------------------------------------------------------|
@@ -168,16 +175,16 @@ Ce tableau contient les informations relatives aux individus sur lesquels les co
 
 | **Variable**              | **Description**                                                   |
 |---------------------------|-----------------------------------------------------------------|
-| Collier                   | Identifiant du collier                                         |
-| Bat                       | Référence de la brebis portant le collier                     |
-| Programmation             | Type de programmation du collier                              |
-| Alpage                    | Nom de l’alpage où l’individu se trouve                      |
-| Espèce                    | Espèce de l’individu                                         |
-| Race                      | Race de l’individu                                           |
-| Éleveur                   | Identifiant de l’éleveur                                      |
-| Âge                       | Âge de l’individu en mois                                    |
-| Période échantillonnage   | Période d’échantillonnage en fraction de la journée          |
-| Proportion jour allumé    | Durée pendant laquelle le collier est actif                  |
+| Collier                   | Identifiant du collier                                               |
+| Bat                       | Référence de la batterie du GPS (optionnel)                          |
+| Programmation             | Type de programmation du collier                                     |
+| Alpage                    | Nom de l’alpage où l’individu se trouve                              |
+| Espèce                    | Espèce de l’individu (optionnel)                                     |
+| Race                      | Race de l’individu (optionnel)                                       |
+| Éleveur                   | Identifiant de l’éleveur (optionnel)                                 |
+| Âge                       | Âge de l’individu en années (optionnel)                              |
+| Période échantillonnage   | Période d’échantillonnage, durée en secondes (temps d’acquisition entre deux points) |
+| Proportion jour allumé    | Fraction de la journée durant laquelle le collier est actif          |
 | Date pose                 | Date de pose du collier *(format : `dd/mm/yyyy hh:mm:ss`)*     |
 | Date retrait              | Date de retrait du collier *(format : `dd/mm/yyyy hh:mm:ss`)*  |
 
