@@ -145,10 +145,10 @@ Ce tableau regroupe les informations principales liées à l’alpage. Dans le j
 | proportion_jour_allume    | Fraction de la journée où les colliers sont allumés *(1 = 24h/24)* |
 | taille_troupeau           | Taille du troupeau associé à l’alpage                            |
 | nom1_UP                   | ?Nom de l’unité de pâturage principale?                          |
-| medcrit                   | Valeur seuil median (en mètre) ; Parmètres de Bjorneraas         |
-| meancrit                  | Valeur seuil moyen (en mètre) ; Parmètres de Bjorneraas          |
-| spikesp                   | Seuil de vitesse du pic ; Parmètres de Bjorneraas                |
-| spikecos                  | Seuil de l'angle du pic ; Parmètres de Bjorneraas                |
+| medcrit                   | Valeur seuil median (en mètre) ; *Parmètres de Bjorneraas*         |
+| meancrit                  | Valeur seuil moyen (en mètre) ; *Parmètres de Bjorneraas*          |
+| spikesp                   | Seuil de vitesse du pic ; *Parmètres de Bjorneraas*                |
+| spikecos                  | Seuil de l'angle du pic ; *Parmètres de Bjorneraas*                |
 
 
 #### Évolution de la taille du troupeau : `AAAA_tailles_troupeaux.csv`
@@ -176,15 +176,15 @@ Ce tableau contient les informations relatives aux individus sur lesquels les co
 | **Variable**              | **Description**                                                   |
 |---------------------------|-----------------------------------------------------------------|
 | Collier                   | Identifiant du collier                                               |
-| Bat                       | Référence de la batterie du GPS (optionnel)                          |
+| Bat                       | Référence de la batterie du GPS *(optionnel)*                          |
 | Programmation             | Type de programmation du collier                                     |
 | Alpage                    | Nom de l’alpage où l’individu se trouve                              |
-| Espèce                    | Espèce de l’individu (optionnel)                                     |
-| Race                      | Race de l’individu (optionnel)                                       |
-| Éleveur                   | Identifiant de l’éleveur (optionnel)                                 |
-| Âge                       | Âge de l’individu en années (optionnel)                              |
-| Période échantillonnage   | Période d’échantillonnage, durée en secondes (temps d’acquisition entre deux points) |
-| Proportion jour allumé    | Fraction de la journée durant laquelle le collier est actif          |
+| Espèce                    | Espèce de l’individu *(optionnel)*                                     |
+| Race                      | Race de l’individu *(optionnel)*                                       |
+| Éleveur                   | Identifiant de l’éleveur *(optionnel)*                                 |
+| Âge                       | Âge de l’individu en années *(optionnel)*                              |
+| Période échantillonnage   | Période d’échantillonnage, durée en secondes *(temps d’acquisition entre deux points)* |
+| Proportion jour allumé    | Fraction de la journée durant laquelle le collier est allumé *(1 = 24h/24)        |
 | Date pose                 | Date de pose du collier *(format : `dd/mm/yyyy hh:mm:ss`)*     |
 | Date retrait              | Date de retrait du collier *(format : `dd/mm/yyyy hh:mm:ss`)*  |
 
@@ -343,7 +343,6 @@ Il s'appuie sur les trajectoires filtrées par le filtre de Bjørneraas effectu�
 
 ---
 
----
 
 **Partie 5 : FLOCK STOCKING RATE**
 
